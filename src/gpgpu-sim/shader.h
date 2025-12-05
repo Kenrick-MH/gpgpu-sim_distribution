@@ -45,6 +45,7 @@
 #include <set>
 #include <utility>
 #include <vector>
+#include <cstdint>
 
 // #include "../cuda-sim/ptx.tab.h"
 
