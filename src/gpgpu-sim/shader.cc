@@ -4480,7 +4480,7 @@ simt_core_cluster::simt_core_cluster(class gpgpu_sim *gpu, unsigned cluster_id,
   m_stats = stats;
   m_memory_stats = mstats;
   m_mem_config = mem_config;
-  total_cluster_cta = 0
+  total_cluster_cta = 0;
 }
 
 void simt_core_cluster::core_cycle() {
