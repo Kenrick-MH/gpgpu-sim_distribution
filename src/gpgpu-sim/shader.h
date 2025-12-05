@@ -1814,6 +1814,9 @@ struct shader_core_stats_pod {
   unsigned made_write_mfs;
   unsigned made_read_mfs;
 
+  // number of global memory instructions
+  int gpgpu_n_glob_insn;
+
   unsigned *gpgpu_n_shmem_bank_access;
   long *n_simt_to_mem;  // Interconnect power stats
   long *n_mem_to_simt;
