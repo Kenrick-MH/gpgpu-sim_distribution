@@ -4480,6 +4480,7 @@ simt_core_cluster::simt_core_cluster(class gpgpu_sim *gpu, unsigned cluster_id,
   m_stats = stats;
   m_memory_stats = mstats;
   m_mem_config = mem_config;
+  total_cluster_cta = 0
 }
 
 void simt_core_cluster::core_cycle() {
@@ -4572,6 +4573,7 @@ unsigned simt_core_cluster::issue_block2core() {
       }
     }
   }
+  total_cluster_cta += this->get_n_active_cta();
 
   unsigned num_blocks_issued = 0;
   for (unsigned i = 0; i < m_config->n_simt_cores_per_cluster; i++) {

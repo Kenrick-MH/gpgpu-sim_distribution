@@ -2661,6 +2661,9 @@ class simt_core_cluster {
                               unsigned long long &total) const;
   virtual void create_shader_core_ctx() = 0;
 
+  // stat
+  uint64_t get_total_cluster_cta() { return this->total_cluster_cta; }
+
  protected:
   unsigned m_cluster_id;
   gpgpu_sim *m_gpu;
@@ -2673,6 +2676,7 @@ class simt_core_cluster {
   unsigned m_cta_issue_next_core;
   std::list<unsigned> m_core_sim_order;
   std::list<mem_fetch *> m_response_fifo;
+  uint64_t total_cluster_cta;
 };
 
 class exec_simt_core_cluster : public simt_core_cluster {

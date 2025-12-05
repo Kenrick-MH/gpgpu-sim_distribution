@@ -1963,6 +1963,7 @@ void gpgpu_sim::issue_block2core() {
     while (num) {
       m_last_cluster_issue = idx;
       m_total_cta_launched += num;
+      num = m_cluster[idx]->issue_block2core();
     }
   }
 }
