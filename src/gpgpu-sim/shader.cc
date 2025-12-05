@@ -742,6 +742,15 @@ void shader_core_stats::print(FILE *fout) const {
   // ============== SIMT Efficiency ===============================
   // Value ranges from 1/32 to 32/32
   // Avoid divide-by-zero if no warps were issued (can happen in short runs)
+
+  int total_active_threads = 0;
+  int total_issued_warps = 0;
+
+  for(unsigned i = 1; i <= m_config->warp_size; i ++){
+    total_active_threads += i * shader_cycle_distro[i + 2];
+    total_issued_warps += shader_cycle_distro[i + 2];
+  }
+  
   float simt_eff = 0.0f;
   if (total_issued_warps > 0 && m_config->warp_size > 0) {
     simt_eff = ((float)(total_active_threads)) /
