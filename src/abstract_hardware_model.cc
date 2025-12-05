@@ -1183,6 +1183,19 @@ void simt_stack::update(simt_mask_t &thread_done, addr_vector_t &next_pc,
     m_stack.push_back(simt_stack_entry());
   }
   assert(m_stack.size() > 0);
+  
+  // When reconverging, the top entry holds the cycle when divergence started.
+  if (m_stack.back().m_branch_div_cycle != 0) {
+    unsigned long long reconv_cycle =
+        m_gpu->gpu_sim_cycle + m_gpu->gpu_tot_sim_cycle;
+    unsigned long long duration =
+        reconv_cycle - m_stack.back().m_branch_div_cycle;
+    // Log the diverging PC and how long the warp stayed divergent.
+    printf("diverge_pc=0x%llx duration=%llu\n", (unsigned long long)top_pc,
+           duration);
+    m_stack.back().m_branch_div_cycle = 0;
+  }
+
   m_stack.pop_back();
 
   if (warp_diverged) {
