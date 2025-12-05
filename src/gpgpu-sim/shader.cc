@@ -750,7 +750,7 @@ void shader_core_stats::print(FILE *fout) const {
     total_active_threads += i * shader_cycle_distro[i + 2];
     total_issued_warps += shader_cycle_distro[i + 2];
   }
-
+  
   float simt_eff = 0.0f;
   if (total_issued_warps > 0 && m_config->warp_size > 0) {
     simt_eff = ((float)(total_active_threads)) /
@@ -761,7 +761,7 @@ void shader_core_stats::print(FILE *fout) const {
   fprintf(fout, "simt_efficiency: %f\t", simt_eff);
       
   // ============== Memory Divergence ===============================
-  int glob_mem_acc = gpgpu_n_load_insn + gpgpu_n_mem_write_global;
+  int glob_mem_acc = gpgpu_n_mem_read_global + gpgpu_n_mem_write_global;
   // Guard against zero to prevent NaN when no global instructions executed
   float mem_divergence =
       gpgpu_n_glob_insn > 0
