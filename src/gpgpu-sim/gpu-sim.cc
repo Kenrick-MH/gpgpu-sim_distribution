@@ -1671,6 +1671,8 @@ void shader_core_ctx::mem_instruction_stats(const warp_inst_t &inst) {
       m_stats->gpgpu_n_tex_insn += active_count;
       break;
     case global_space:
+      m_stats->gpgpu_n_glob_insn += 1;
+      break;
     case local_space:
       if (inst.is_store())
         m_stats->gpgpu_n_store_insn += active_count;
