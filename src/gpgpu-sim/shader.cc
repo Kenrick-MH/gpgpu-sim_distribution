@@ -739,6 +739,27 @@ void shader_core_stats::print(FILE *fout) const {
     fprintf(fout, "WS%d:%d\t", i, dual_issue_nums[i]);
   fprintf(fout, "\n");
 
+  // ============== SIMT Efficiency ===============================
+  // Value ranges from 1/32 to 32/32
+  // Avoid divide-by-zero if no warps were issued (can happen in short runs)
+  float simt_eff = 0.0f;
+  if (total_issued_warps > 0 && m_config->warp_size > 0) {
+    simt_eff = ((float)(total_active_threads)) /
+               (m_config->warp_size * total_issued_warps);
+  }
+
+    
+  fprintf(fout, "simt_efficiency: %f\t", simt_eff);
+      
+  // ============== Memory Divergence ===============================
+  int glob_mem_acc = gpgpu_n_mem_read_global + gpgpu_n_mem_write_global;
+  // Guard against zero to prevent NaN when no global instructions executed
+  float mem_divergence =
+      gpgpu_n_glob_insn > 0
+          ? (float)(glob_mem_acc) / gpgpu_n_glob_insn
+          : 0.0f;
+  fprintf(fout, "mem_divergence: %f\t", mem_divergence);
+
   m_outgoing_traffic_stats->print(fout);
   m_incoming_traffic_stats->print(fout);
 }
