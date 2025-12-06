@@ -1452,6 +1452,11 @@ void gpgpu_sim::gpu_print_stat(unsigned long long streamID) {
   std::string kernel_info_str = executed_kernel_info_string();
   fprintf(statfout, "%s", kernel_info_str.c_str());
 
+
+  double n_sms = m_config.num_shader();
+  double avg_cta_per_sm = ((double) total_n_active_cta) / (gpu_tot_sim_cycle * n_sms);
+
+  printf("gpu_avg_cta_per_sm_per_cyle = %ld", avg_cta_per_sm);
   printf("kernel_stream_id = %llu\n", streamID);
 
   printf("gpu_sim_cycle = %lld\n", gpu_sim_cycle);
@@ -1965,6 +1970,12 @@ void gpgpu_sim::issue_block2core() {
       m_total_cta_launched += num;
       break;
     }
+  }
+
+  /* Sum current active CTAs in each cluster */
+  for (unsigned i = 0; i < m_shader_config->n_simt_clusters; i++) {
+    simt_core_cluster *cluster = m_cluster[i];
+    total_n_active_cta += cluster->get_n_active_cta();
   }
 }
 
