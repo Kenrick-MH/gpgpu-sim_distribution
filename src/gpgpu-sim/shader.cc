@@ -4594,7 +4594,7 @@ unsigned simt_core_cluster::issue_block2core() {
         num_blocks_issued++;  
         m_cta_issue_next_core = core;
       } else {
-        m_cta_issue_next_core = core + 1 % m_config->n_simt_cores_per_cluster;
+        m_cta_issue_next_core = (core + 1) % m_config->n_simt_cores_per_cluster;
       }
   }
 
