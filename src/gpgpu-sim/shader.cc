@@ -4544,48 +4544,45 @@ unsigned simt_core_cluster::get_n_active_sms() const {
 
 unsigned simt_core_cluster::issue_block2core() {
   const unsigned max_pending_ctas = 4;
-  for (unsigned core = 0; core < m_config->n_simt_cores_per_cluster; core++) {
-    if (m_core[core]->pending_ctas.size() < max_pending_ctas) {
-      kernel_info_t *kernel;
-      // Jin: fetch kernel according to concurrent kernel setting
-      if (m_config->gpgpu_concurrent_kernel_sm) {  // concurrent kernel on sm
-        // always select latest issued kernel
-        kernel_info_t *k = m_gpu->select_kernel();
-        kernel = k;
-      } else {
-        // first select core kernel, if no more cta, get a new kernel
-        // only when core completes
-        kernel = m_core[core]->get_kernel();
-        if (!m_gpu->kernel_more_cta_left(kernel)) {
-          // wait till current kernel finishes
-          if (m_core[core]->get_not_completed() == 0) {
-            kernel_info_t *k = m_gpu->select_kernel();
-            if (k) m_core[core]->set_kernel(k);
-            kernel = k;
-          }
-        }
-      }
-      if (kernel) {
-        if (kernel->allocated_ctas < kernel->num_blocks()) {
-          m_core[core]->pending_ctas.push_back(kernel);
-          kernel->allocated_ctas++;
+  unsigned core = m_cta_issue_next_core;
+  if (m_core[core]->pending_ctas.size() < max_pending_ctas) {
+    kernel_info_t *kernel;
+    // Jin: fetch kernel according to concurrent kernel setting
+    if (m_config->gpgpu_concurrent_kernel_sm) {  // concurrent kernel on sm
+      // always select latest issued kernel
+      kernel_info_t *k = m_gpu->select_kernel();
+      kernel = k;
+    } else {
+      // first select core kernel, if no more cta, get a new kernel
+      // only when core completes
+      kernel = m_core[core]->get_kernel();
+      if (!m_gpu->kernel_more_cta_left(kernel)) {
+        // wait till current kernel finishes
+        if (m_core[core]->get_not_completed() == 0) {
+          kernel_info_t *k = m_gpu->select_kernel();
+          if (k) m_core[core]->set_kernel(k);
+          kernel = k;
         }
       }
     }
+    if (kernel) {
+      if (kernel->allocated_ctas < kernel->num_blocks()) {
+        m_core[core]->pending_ctas.push_back(kernel);
+        kernel->allocated_ctas++;
+      }
+    }
   }
-  
+
 
   unsigned num_blocks_issued = 0;
-  for (unsigned i = 0; i < m_config->n_simt_cores_per_cluster; i++) {
 
     /* 
       Instead of starting from the next, start from this core.
       Makes sure such that in the next iteration the scheduler 
       always fills the SM to the brim first.
-    */
-    unsigned core =
-        (i + m_cta_issue_next_core) % m_config->n_simt_cores_per_cluster;
 
+    */
+  unsigned core = m_cta_issue_next_core;
     /* 
       Loop only finds for a SM that can be used to issue block, then exits.
     */
@@ -4594,11 +4591,11 @@ unsigned simt_core_cluster::issue_block2core() {
       if (m_core[core]->can_issue_1block(*pending_cta)) {
         m_core[core]->issue_block2core(*pending_cta);
         m_core[core]->pending_ctas.pop_front();
-        num_blocks_issued++;
+        num_blocks_issued++;  
         m_cta_issue_next_core = core;
-        break;
+      } else {
+        m_cta_issue_next_core = core + 1 % m_config->n_simt_cores_per_cluster;
       }
-    }
   }
 
   total_cluster_cta += this->get_n_active_cta();
