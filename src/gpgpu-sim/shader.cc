@@ -4577,9 +4577,18 @@ unsigned simt_core_cluster::issue_block2core() {
 
   unsigned num_blocks_issued = 0;
   for (unsigned i = 0; i < m_config->n_simt_cores_per_cluster; i++) {
-    unsigned core =
-        (i + m_cta_issue_next_core + 1) % m_config->n_simt_cores_per_cluster;
 
+    /* 
+      Instead of starting from the next, start from this core.
+      Makes sure such that in the next iteration the scheduler 
+      always fills the SM to the brim first.
+    */
+    unsigned core =
+        (i + m_cta_issue_next_core) % m_config->n_simt_cores_per_cluster;
+
+    /* 
+      Loop only finds for a SM that can be used to issue block, then exits.
+    */
     if (m_core[core]->pending_ctas.size() > 0) {
       kernel_info_t *pending_cta = m_core[core]->pending_ctas.front();
       if (m_core[core]->can_issue_1block(*pending_cta)) {
