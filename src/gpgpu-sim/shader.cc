@@ -3058,9 +3058,6 @@ void gpgpu_sim::shader_print_scheduler_stat(FILE *fout,
                                             bool print_dynamic_info) const {
   fprintf(fout, "ctas_completed %d, ", m_shader_stats->ctas_completed);
 
-
-  unsigned total_sm = m_config.num_cluster()
-  fprintf(fout, "avg_cta_per_sm_per_cycle %lf", gpu_tot_issued_cta/gpu_tot_sim_cycle);
   // Print out the stats from the sampling shader core
   const unsigned scheduler_sampling_core =
       m_shader_config->gpgpu_warp_issue_shader;
