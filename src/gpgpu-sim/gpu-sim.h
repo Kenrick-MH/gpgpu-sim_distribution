@@ -727,6 +727,7 @@ class gpgpu_sim : public gpgpu_t {
   class gpgpu_sim_wrapper *m_gpgpusim_wrapper;
   unsigned long long last_gpu_sim_insn;
   unsigned long long total_n_active_cta;
+  unsigned long long n_measure_active_cta; 
 
   unsigned long long last_liveness_message_time;
 

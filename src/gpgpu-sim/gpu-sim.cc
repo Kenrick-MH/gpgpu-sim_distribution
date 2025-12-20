@@ -1001,6 +1001,8 @@ gpgpu_sim::gpgpu_sim(const gpgpu_sim_config &config, gpgpu_context *ctx)
   m_total_cta_launched = 0;
   gpu_deadlock = false;
 
+  n_measure_active_cta = 0;
+  total_n_active_cta = 0;
   gpu_stall_dramfull = 0;
   gpu_stall_icnt2sh = 0;
   partiton_reqs_in_parallel = 0;
@@ -1454,9 +1456,9 @@ void gpgpu_sim::gpu_print_stat(unsigned long long streamID) {
 
 
   double n_sms = m_config.num_shader();
-  double avg_cta_per_sm = ((double) total_n_active_cta) / (gpu_tot_sim_cycle * n_sms);
+  double avg_cta_per_sm = ((double) total_n_active_cta) / (n_measure_active_cta * n_sms);
 
-  printf("gpu_avg_cta_per_sm_per_cyle = %ld", avg_cta_per_sm);
+  printf("gpu_avg_cta_per_sm = %ld", avg_cta_per_sm);
   printf("kernel_stream_id = %llu\n", streamID);
 
   printf("gpu_sim_cycle = %lld\n", gpu_sim_cycle);
@@ -1977,6 +1979,8 @@ void gpgpu_sim::issue_block2core() {
     simt_core_cluster *cluster = m_cluster[i];
     total_n_active_cta += cluster->get_n_active_cta();
   }
+
+  n_measure_active_cta++;
 }
 
 unsigned long long g_single_step =
