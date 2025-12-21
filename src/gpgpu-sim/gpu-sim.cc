@@ -1458,8 +1458,11 @@ void gpgpu_sim::gpu_print_stat(unsigned long long streamID) {
   double n_sms = m_config.num_shader();
   double avg_cta_per_sm = ((double) total_n_active_cta) / (n_measure_active_cta * n_sms);
 
-  printf("gpu_avg_cta_per_sm = %ld", avg_cta_per_sm);
+  printf("total_active_cta = %lld\n", total_n_active_cta);
+  printf("sample_total = %lld\n", n_measure_active_cta);
   printf("kernel_stream_id = %llu\n", streamID);
+  printf("avg_cta_per_sm = %12.4f\n", avg_cta_per_sm);
+
 
   printf("gpu_sim_cycle = %lld\n", gpu_sim_cycle);
   printf("gpu_sim_insn = %lld\n", gpu_sim_insn);
